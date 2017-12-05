@@ -25,8 +25,8 @@ public class JavaCodeGenerator {
             "<type declaration> ::= <class declaration> |  ",
             "<class declaration> ::= <class modifiers>? class <type identifier> <super>? <interfaces>? <class body>",
             "<class modifiers> ::= <class modifier> | <class modifiers> <class modifier>",
-            //"<class modifiers> ::= <class modifier> | <class modifiers> <class modifier>",
-            //"<class modifier> ::= public | abstract | final",
+            "<class modifiers> ::= <class modifier> | <class modifiers> <class modifier>",
+            "<class modifier> ::= public | abstract | final",
             "<super> ::= extends <class type>",
             "<class type> ::= <type name>",
             "<type name> ::= <type identifier> | <package class name>.<type identifier>",
@@ -77,7 +77,7 @@ public class JavaCodeGenerator {
             System.out.println("found:" + found);
 
 
-            if (production_rules.get(found) != null && found!="<type declarations>") {
+            if (production_rules.get(found) != null && !found.equals("<type declarations>")) {
 
                 ArrayList<String> rules_associated = production_rules.get(found);
                 if (!rules_associated.isEmpty()) {
@@ -170,16 +170,15 @@ public class JavaCodeGenerator {
         String s = "<package declaration> <import declarations>  <type declarations> ";
         //s = "<type declarations>";
         String got = "";
-        s = s.replace("<package declaration>",jcg.generatePackage("<package declaration>"));
-        s = s.replace("<import declarations>",jcg.generateImport("<import declarations>"));
-        got = s.replace("<type declarations>",jcg.generateClass("<type declarations>"));
-        //got = jcg.generateClass(s);
-        got = got.replaceAll("\\?", "");
-        System.out.println("\n\n\n\n\n\nGOT: " + got);
+        s = s.replace("<package declaration>",jcg.generatePackage(s));
+        s = jcg.generateImport(s);
+        s = jcg.generateClass(s);
+        s = s.replaceAll("\\?", "");
+        System.out.println("\n\n\n\n\n\nGOT: " + s);
         File f = new File("/Users/sharandec7/Desktop/vishalkumar_malli_guneshekaran_saisharan_nagulapalli_reenamary/src/main/java", "B" + ".java");
         if (!f.exists())//check if the file already exists
             f.createNewFile();
-        //FileUtils.writeStringToFile(f, got);
+        FileUtils.writeStringToFile(f, s);
     }
 
     private String generatePackage(String s) {
