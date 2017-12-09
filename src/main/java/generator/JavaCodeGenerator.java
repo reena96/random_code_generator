@@ -1,3 +1,5 @@
+package generator;
+
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -15,6 +17,7 @@ public class JavaCodeGenerator {
     static int maxNoOfInterfaces = 1;
     static int maxNoOfImports = 2;
     static int maxNoOfTypes = 2;
+    static String code = "";
 
     String classbnf[] = {
 
@@ -41,7 +44,7 @@ public class JavaCodeGenerator {
             "<abstract method modifiers> ::= <abstract method modifier> | <abstract method modifiers> <abstract method modifier>",
             "<abstract method modifier> ::= public | abstract",
             "<array initializer> ::= { <variable initializers>? , ? }",
-            "<variable initializers> ::= <variable initializer> | <variable initializers> , <variable initializer>",
+            "<variable initializers> ::= <variable initializer>aswer45edsaerAs | <variable initializers> , <variable initializer>",
             "<variable initializer> ::= <expression> | <array initializer>",
             "<variable declarators> ::= <variable declarator> | <variable declarators> , <variable declarator>",
             "<variable declarator> ::= <variable declarator id> | <variable declarator id> = <variable initializer>",
@@ -97,6 +100,19 @@ public class JavaCodeGenerator {
 
             "<method identifier> ::= method1 | method2 | method3 | method4 | method5",
 
+            "<block> ::= { <block statements>? }",
+            "<block statements> ::= <block statement> | <block statements> <block statement>",
+            "<block statement> ::= <local variable declaration statement> | <statement>",
+            "<local variable declaration statement> ::= <local variable declaration> ;",
+            "<local variable declaration> ::= <type> <variable declarators>",
+            //"<statement> ::= <statement without trailing substatement> | <labeled statement> | <if then statement> | <if then else statement> | <while statement> | <for statement>",
+            "<statement no short if> ::= <statement without trailing substatement> | <labeled statement no short if> | <if then else statement no short if> | <while statement no short if> | <for statement no short if>",
+            "<statement without trailing substatement> ::= <block> | <empty statement> | <expression statement> | <switch statement> | <do statement> | <break statement> | <continue statement> | <return statement> ",
+            "<empty statement> ::= ;",
+            "<labeled statement> ::= <identifier> : <statement>",
+            "<labeled statement no short if> ::= <identifier> : <statement no short if>",
+            "<expression statement> ::= <statement expression> ;",
+            "<statement expression> ::= <assignment> | <preincrement expression> | <postincrement expression> | <predecrement expression> | <postdecrement expression> | <method invocation> | <class instance creation expression>",
 
             "<field declaration> ::= <field modifiers>? <type> <variable declarators> ;",
             "<field modifiers> ::= <field modifier> | <field modifiers> <field modifier>",
@@ -104,9 +120,9 @@ public class JavaCodeGenerator {
 
             "<type> ::= <primitive type> | <reference type>",
             "<primitive type> ::= <numeric type> | boolean",
-            "<numeric type> ::= <integral type> | <floating-point type>",
+            "<numeric type> ::= <integral type>",
             "<integral type> ::= byte | short | int | long | char",
-            "<floating-point type> ::= float | double",
+            //"<floating-point type> ::= float | double",
             "<reference type> ::= <class or interface type> | <array type>",
             "<class or interface type> ::= <class type> | <interface type>",
             "<class type> ::= <type name>",
@@ -117,6 +133,112 @@ public class JavaCodeGenerator {
             "<expression name> ::= <identifier> | <ambiguous name> . <identifier>",
             "<method name> ::= <identifier> | <ambiguous name>. <identifier>",
             "<ambiguous name>::= <identifier> | <ambiguous name>. <identifier>",
+
+
+            "<if then statement>::= if ( <expression> ) <statement>",
+            "<if then else statement>::= if ( <expression> ) <statement no short if> else <statement>",
+            "<if then else statement no short if> ::= if ( <expression> ) <statement no short if> else <statement no short if>",
+            /*
+            "<switch statement> ::= switch ( <expression> ) <switch block>",
+            "<switch block> ::= { <switch block statement groups>? <switch labels>? }",
+            "<switch block statement groups> ::= <switch block statement group> | <switch block statement groups> <switch block statement group>",
+            "<switch block statement group> ::= <switch labels> <block statements>",
+            "<switch labels> ::= <switch label> | <switch labels> <switch label>",
+            "<switch label> ::= case <constant expression> : | default :",
+            */
+            "<while statement> ::= while ( <expression> ) <statement>",
+            "<while statement no short if> ::= while ( <expression> ) <statement no short if>",
+            "<do statement> ::= do <statement> while ( <expression> ) ;",
+            "<for statement> ::= for ( <for init>? ; <expression>? ; <for update>? ) <statement>",
+            "<for statement no short if> ::= for ( <for init>? ; <expression>? ; <for update>? ) <statement no short if>",
+            "<for init> ::= <statement expression list> | <local variable declaration>",
+            "<for update> ::= <statement expression list>",
+            "<statement expression list> ::= <statement expression> | <statement expression list> , <statement expression>",
+            "<break statement> ::= break <identifier>? ;",
+            "<continue statement> ::= continue <identifier>? ;",
+            "<return statement> ::= return <expression>? ;",
+            /*
+            "<throws statement> ::= throw <expression> ;",
+            "<synchronized statement> ::= synchronized ( <expression> ) <block>",
+            "<try statement> ::= try <block> <catches> | try <block> <catches>? <finally>",
+            "<catches> ::= <catch clause> | <catches> <catch clause>",
+            "<catch clause> ::= catch ( <formal parameter> ) <block>",
+            "<finally > ::= finally <block>",
+            */
+            "<constant expression> ::= <expression>",
+            "<expression> ::= <assignment expression>",
+            "<assignment expression> ::= <conditional expression> | <assignment>",
+            "<assignment> ::= <left hand side> <assignment operator> <assignment expression>",
+            "<left hand side> ::= <expression name> | <field access> | <array access>",
+            "<assignment operator> ::= = | *= | /= | %= | += | -= | <<= | >>= | >>>= | &= | ^= | |=",
+            "<conditional expression> ::= <conditional or expression> | <conditional or expression> ? <expression> : <conditional expression>",
+            "<conditional or expression> ::= <conditional and expression> | <conditional or expression> || <conditional and expression>",
+            "<conditional and expression> ::= <inclusive or expression> | <conditional and expression> && <inclusive or expression>",
+            "<inclusive or expression> ::= <exclusive or expression> | <inclusive or expression> | <exclusive or expression>",
+            "<exclusive or expression> ::= <and expression> | <exclusive or expression> ^ <and expression>",
+            "<and expression> ::= <equality expression> | <and expression> & <equality expression>",
+            "<equality expression> ::= <relational expression> | <equality expression> == <relational expression> | <equality expression> != <relational expression>",
+
+            "<relational expression> ::= <shift expression> | <relational expression> < <shift expression> | <relational expressio> > <shift expression> | <relational expression> <= <shift expression> | <relational expression> >= <shift expression> | <relational expression> instanceof <reference type>",
+
+            "<shift exression> ::= <additive expression> | <shift expression> << <additive expression> | <shift expression> >> <additive expression> | <shift expression> >>> <additive expression>",
+            "<additive expression> ::= <multiplicative expression> | <additive expression> + <multiplicative expression> | <additive expression> - <multiplicative expression>",
+
+            "<multiplicative expression> ::= <unary expression> | <multiplicative expression> * <unary expression> | <multiplicative expression> / <unary expression> | <multiplicative expression> % <unary expression>",
+            "<cast expression> ::= ( <primitive type> ) <unary expression> | ( <reference type> ) <unary expression not plus minus>",
+            "<unary expression> ::= <preincrement expression> | <predecrement expression> | + <unary expression> | - <unary expression> | <unary expression not plus minus>",
+            "<predecrement expression> ::= -- <unary expression>",
+            "<preincrement expression> ::= ++ <unary expression>",
+            "<unary expression not plus minus> ::= <postfix expression> | ~ <unary expression> | ! <unary expression> | <cast expression>",
+            "<postdecrement expression> ::= <postfix expression> --",
+            "<postincrement expression> ::= <postfix expression> ++",
+            "<postfix expression> ::= <primary> | <expression name> | <postincrement expression> | <postdecrement expression>",
+            "<method invocation> ::= <method name> ( <argument list>? ) | <primary> . <identifier> ( <argument list>? ) | super . <identifier> ( <argument list>? )",
+            "<field access> ::= <primary> . <identifier> | super . <identifier>",
+            "<primary> ::= <primary no new array> | <array creation expression>",
+            "<primary no new array> ::= <literal> | this | ( <expression> ) | <class instance creation expression> | <field access> | <method invocation> | <array access>",
+            "<class instance creation expression> ::= new <class type> ( <argument list>? )",
+            "<argument list> ::= <expression> | <argument list> , <expression>",
+            "<array creation expression> ::= new <primitive type> <dim exprs> <dims>? | new <class or interface type> <dim exprs> <dims>?",
+            "<dim exprs> ::= <dim expr> | <dim exprs> <dim expr>",
+            "<dim expr> ::= [ <expression> ]",
+            "<dims> ::= [ ] | <dims> [ ]",
+            "<array access> ::= <expression name> [ <expression> ] | <primary no new array> [ <expression>]",
+            "<package name> ::= <identifier> | <package name> . <identifier>",
+            "<type name> ::= <identifier> | <package name> . <identifier>",
+            "<simple type name> ::= <identifier>",
+            "<expression name> ::= <identifier> | <ambiguous name> . <identifier>",
+            "<method name> ::= <identifier> | <ambiguous name>. <identifier>",
+            "<ambiguous name>::= <identifier> | <ambiguous name>. <identifier>",
+            "<literal> ::= <integer literal> | <floating-point literal> | <boolean literal> | <character literal> | <string literal> | <null literal>",
+            "<integer literal> ::= <decimal integer literal> | <hex integer literal> | <octal integer literal>",
+            "<decimal integer literal> ::= <decimal numeral> <integer type suffix>?",
+            "<hex integer literal> ::= <hex numeral> <integer type suffix>?",
+            "<octal integer literal> ::= <octal numeral> <integer type suffix>?",
+            "<integer type suffix> ::= l | L",
+            "<decimal numeral> ::= 0 | <non zero digit> <digits>?",
+            "<digits> ::= <digit> | <digits> <digit>",
+            "<digit> ::= 0 | <non zero digit>",
+            "<non zero digit> ::= 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9",
+            "<hex numeral> ::= 0 x <hex digit> | 0 X <hex digit> | <hex numeral> <hex digit>",
+            "<hex digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | a | b | c | d | e | f | A | B | C | D | E | F",
+            "<octal numeral> ::= 0 <octal digit> | <octal numeral> <octal digit>",
+            "<octal digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7",
+            "<floating-point literal> ::= <digits> . <digits>? <exponent part>? <float type suffix>?",
+            "<digits> ::= <exponent part>? <float type suffix>?",
+            "<exponent part> ::= <exponent indicator> <signed integer>",
+            "<exponent indicator> ::= e | E",
+            "<signed integer> ::= <sign>? <digits>",
+            "<sign> ::= + | -",
+            "<float type suffix> ::= f | F | d | D",
+            "<boolean literal> ::= true | false",
+            "<character literal> ::= ' <single character> ' | ' <escape sequence> '",
+            //"<single character> ::= <input character> except ' and \\",
+            //"<string literal> ::= \" <string characters>?\" ",
+            "<string characters> ::= <string character> | <string characters> <string character>",
+            //"<string character> ::= <input character> except \" and \\ | <escape character>",
+            //"<null literal> ::= null",
+            "<keyword> ::= abstract | boolean | break | byte | case | catch | char | class | const | continue | default | do | double | else | extends | final | finally | float | for | goto | if | implements | import | instanceof | int | interface | long | native | new | package | private | protected | public | return | short | static | super | switch | synchronized | this | throw | throws | transient | try | void | volatile | while"
 
     };
 
@@ -179,20 +301,18 @@ public class JavaCodeGenerator {
                                 System.out.println(">>>>>>------------" + str);
                             }
                             production_rules.put(found, rules_associated);
+
                             import_declaration = import_declaration.replaceFirst(found, replace);
                             import_declaration = generateImport(import_declaration);
-
-                        } else if (!found.equals("<import identifier>")) {
+                        } else {
                             import_declaration = import_declaration.replaceFirst(found, replace);
                             import_declaration = generateImport(import_declaration);
                         }
-
                     } else {
                         import_declaration = import_declaration.replaceFirst(found, "");
                         import_declaration = generateImport(import_declaration);
                     }
                 }
-
             }
         }
         return import_declaration;
@@ -280,23 +400,86 @@ public class JavaCodeGenerator {
                                 }
                                 production_rules.put("<constructor identifier>", constructor_list);
                             }
-                            type_declarations = type_declarations.replaceFirst(found, replace);
-                            type_declarations = generateClass(type_declarations).trim();
-
-                        } else {
-
                             type_declarations = type_declarations.replaceFirst(found, replace).trim();
-                            type_declarations = generateClass(type_declarations).trim();
+                            type_declarations = generateClass(replace).trim();
                         }
+                        type_declarations = type_declarations.replaceFirst(found, replace).trim();
+                        type_declarations = generateClass(replace).trim();
                     } else {
-                        type_declarations = type_declarations.replaceFirst(found, "");
-                        type_declarations = generateImport(type_declarations);
+                        replace = "";
+                        type_declarations = type_declarations.replaceFirst(found, replace);
+                        type_declarations = generateImport(replace);
                     }
                 }
             }
         }
         return type_declarations;
     }
+/*
+
+    void generateClass(String type_declarations) throws ParseException {
+
+
+        System.out.println("actual:" + type_declarations);
+        String regex = "[<][a-z\\s]*[>]";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(type_declarations);
+
+        while (matcher.find()) {
+
+
+            String found = matcher.group(0).trim();
+            System.out.println("found:" + found);
+
+            if (production_rules.get(found) != null) {
+
+                type_declarations = optionalCFG(type_declarations);
+                ArrayList<String> rules_associated = production_rules.get(found);
+                Random r = new Random();
+                String replace = "";
+
+                if (rules_associated.size() > 0) {
+
+                    replace = rules_associated.get(r.nextInt(rules_associated.size())).trim();
+                    System.out.println("replace: " + replace);
+
+                    if (checkConfig(found, replace)) {
+                        System.out.println(maxNoOfTypes);
+
+                        if (found.equals("<interface type identifier>") || found.equals("<class type identifier>")) {
+
+                            rules_associated.remove(replace);
+                            *//*for (String str : rules_associated) {
+                                System.out.println("------------>>>>>>" + str);
+                            }*//*
+                            production_rules.put(found, rules_associated);
+
+                            //add class names to constructors
+                            if (found.equals("<class type identifier>")) {
+                                ArrayList<String> constructor_list = production_rules.get("<constructor identifier>");
+                                constructor_list.add(replace);
+                                for (String str : constructor_list) {
+                                    System.out.println("------------>>>>>>" + str);
+                                }
+                                production_rules.put("<constructor identifier>", constructor_list);
+                            }
+                            type_declarations = type_declarations.replaceFirst(found, replace).trim();
+                            code = type_declarations;
+                            generateClass(type_declarations);//.trim();
+                        }
+                        type_declarations = type_declarations.replaceFirst(found, replace).trim();
+                        code = type_declarations;
+                        generateClass(type_declarations);//.trim();
+                    } else {
+                        type_declarations = type_declarations.replaceFirst(found, "");
+                        code = type_declarations;
+                        generateClass(type_declarations);
+                    }
+                }
+            }
+        }
+
+    }*/
 
     private String optionalCFG(String type_declarations) {
 
@@ -353,7 +536,7 @@ public class JavaCodeGenerator {
         for (String r : generatedCode.split(" ")) {
             if (!r.trim().isEmpty()) {
                 t.add(r.trim());
-                System.out.println("TOKEN: " + r.trim());
+                //System.out.println("TOKEN: " + r.trim());
             }
         }
         if (t.indexOf("class") != -1) {
