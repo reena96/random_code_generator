@@ -149,7 +149,7 @@ public class JavaCodeGenerator {
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(package_declaration);
 
-        while (matcher.find()) {
+        if (matcher.find()) {
 
             String found = matcher.group(0).trim();
             System.out.println("found:" + found);
@@ -189,6 +189,7 @@ public class JavaCodeGenerator {
         return package_declaration;
     }
 
+
     String generateImport(String import_declaration) throws ParseException {
 
         System.out.println("actual:" + import_declaration);
@@ -196,7 +197,7 @@ public class JavaCodeGenerator {
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(import_declaration);
 
-        while (matcher.find()) {
+        if (matcher.find()) {
 
             String found = matcher.group(0).trim();
             System.out.println("found:" + found);
@@ -296,7 +297,7 @@ public class JavaCodeGenerator {
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(type_declarations);
 
-        while (matcher.find()) {
+        if (matcher.find()) {
 
             String found = matcher.group(0).trim();
             System.out.println("found:" + found);
@@ -364,7 +365,7 @@ public class JavaCodeGenerator {
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(type_declarations);
 
-        while (matcher.find()) {
+        if (matcher.find()) {
 
             String found = matcher.group(0).trim().replace("?", "\\?");
             System.out.println("found optional: " + found);
