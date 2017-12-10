@@ -184,7 +184,6 @@ public class JavaCodeGenerator {
                 }
 
             }
-            break;
         }
         return package_declaration;
     }
