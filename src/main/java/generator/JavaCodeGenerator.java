@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public class JavaCodeGenerator {
 
     static Config config = new Config();
-
+    NameGenerator nameGenerator = new NameGenerator();
     static int maxNoOfClasses = 1;
     static int maxNoOfInterfaces = 1;
     static int maxNoOfImports = 2;
@@ -34,13 +34,6 @@ public class JavaCodeGenerator {
             "<import identifier> ::= lang|util|io|net",
             "<package folder name> ::= newlyGeneratedCode",
 
-            "<import declarations> ::= <import declaration>\n | <import declarations> <import declaration>",
-            "<import declaration> ::= <single type import declaration> | <type import on demand declaration>",
-            "<single type import declaration> ::= import <type import name> ;",
-            "<type import on demand declaration> ::= import <package import name>.* ;",
-            "<type import name> ::= <import identifier> | <package import name>.<import identifier>",
-            "<package import name> ::= <import identifier> | <package import name>.<import identifier>",
-            "<import identifier> ::= java|lang|util",
 
             //"<interface declaration> ::= <interface modifiers>? interface <identifier> <extends interfaces>? <interface body>",
             "<interface declaration> ::= <interface modifiers>? interface <interface type identifier> <interface body>",
@@ -80,8 +73,9 @@ public class JavaCodeGenerator {
             "<class modifier> ::= abstract | final | static",
             "<super> ::= extends <class type>",
             "<class type> ::= <type name>",
-            "<type name> ::= <type identifier> | <package class name>.<type identifier>",
-            "<package class name> ::= <type identifier> | <package name>.<type identifier>",
+            "<type name> ::= <class type identifier>|<package class name>.<class type identifier>",
+            "<package class name> ::= <class type identifier> | <package folder name>.<class type identifier>",
+
             "<interfaces> ::= implements <interface type list>",
             "<interface type list> ::= <interface type> | <interface type list> , <interface type>",
             "<class body> ::= { \n<class body declarations> }",
@@ -139,22 +133,22 @@ public class JavaCodeGenerator {
             "<field modifiers> ::= <field modifier> | <field modifiers> <field modifier>",
             "<field modifier> ::= public | protected | private | static | final | transient | volatile",
 
-            "<type> ::= <primitive type> | <reference type>",
-            "<primitive type> ::= <numeric type> | boolean",
-            "<numeric type> ::= <integral type>",
+            "<type> ::= <primitive type> | <reference type> | Object",
+            "<primitive type> ::= <numeric type> | String | char | boolean",
+            "<numeric type> ::= <integral type> | <floatingpoint type>",
             "<integral type> ::= byte | short | int | long | char",
-            //"<floating-point type> ::= float | double",
-            "<reference type> ::= <class or interface type> | <array type>",
+            "<floatingpoint type> ::= float | double",
+            "<reference type> ::= <class or interface type>",
             "<class or interface type> ::= <class type> | <interface type>",
             "<class type> ::= <type name>",
             "<interface type> ::= <type name>",
-            "<array type> ::= <type> [ ]",
+            //"<array type> ::= <type>[]",
 
             "<simple type name> ::= <identifier>",
-            "<expression name> ::= <identifier> | <ambiguous name> . <identifier>",
-            "<method name> ::= <identifier> | <ambiguous name>. <identifier>",
-            "<ambiguous name>::= <identifier> | <ambiguous name>. <identifier>",
-
+            "<expression name> ::= <identifier> | <ambiguous name>.<identifier>",
+            "<method name> ::= <identifier> | <ambiguous name>.<identifier>",
+            "<ambiguous name>::= <identifier> | <ambiguous name>.<identifier>",
+            "<identifier>::= a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z",
 
             "<if then statement>::= if ( <expression> ) <statement>",
             "<if then else statement>::= if ( <expression> ) <statement no short if> else <statement>",
@@ -282,6 +276,54 @@ public class JavaCodeGenerator {
         }
     }
 
+
+    private String generatePackage(String package_declaration) {
+        System.out.println("actual:" + package_declaration);
+        String regex = "[<][a-z\\s]*[>]";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(package_declaration);
+
+        if (matcher.find()) {
+
+            String found = matcher.group(0).trim();
+            System.out.println("found:" + found);
+
+            if (production_rules.get(found) != null && (found.equals("<package declaration>") || found.equals("<package folder name>"))) {
+
+                ArrayList<String> rules_associated = production_rules.get(found);
+
+                if (!rules_associated.isEmpty()) {
+
+                    Random r = new Random();
+                    String replace = rules_associated.get(r.nextInt(rules_associated.size()));
+
+                    //check if allowed to replace and form
+                    if (checkConfig(found, replace)) {
+
+                        //if yes then replace
+                        if (found.equals("<package folder name>")) {
+
+                            System.out.println("replace:" + replace);
+                            rules_associated.remove(replace);
+
+                            production_rules.put(found, rules_associated);
+
+                        }
+                        package_declaration = package_declaration.replaceFirst(found, replace);
+                        package_declaration = generatePackage(package_declaration);
+                    } else {
+                        package_declaration = package_declaration.replaceFirst(found, "");
+                        package_declaration = generatePackage(package_declaration);
+                    }
+                }
+
+            }
+
+        }
+        return package_declaration;
+    }
+
+
     void randomGrammarPicker() {
         Random randomNumberGenerator = new Random();
         String grammarRule = classbnf[randomNumberGenerator.nextInt(5)];
@@ -342,6 +384,7 @@ public class JavaCodeGenerator {
         return import_declaration;
     }
 
+
     private boolean checkConfig(String found, String replace) {
 
 
@@ -389,7 +432,9 @@ public class JavaCodeGenerator {
         return true;
     }
 
+
     String generateClass(String type_declarations) throws ParseException {
+
 
         System.out.println("actual:" + type_declarations);
         String regex = "[<][a-z\\s]*[>]";
@@ -405,7 +450,6 @@ public class JavaCodeGenerator {
 
                 type_declarations = optionalCFG(type_declarations);
                 ArrayList<String> rules_associated = production_rules.get(found);
-                NameGenerator nameGenerator = new NameGenerator();
                 Random r = new Random();
 
                 if (!rules_associated.isEmpty()) {
@@ -414,17 +458,18 @@ public class JavaCodeGenerator {
                     System.out.println("replace: " + replace);
 
                     if (checkConfig(found, replace)) {
-                        System.out.println("NO OF TYPES: " + config.maxNoOfTypes);
 
+                        System.out.println(config.maxNoOfTypes);
                         if (found.equals("<interface type identifier>") || found.equals("<class type identifier>")) {
 
                             replace = nameGenerator.formClassName();
                             System.out.println("Class NAME GENERATED: " + replace);
 
-                            /*for (String str : rules_associated) {
+                            /*rules_associated.remove(replace);
+                            for (String str : rules_associated) {
                                 System.out.println("------------>>>>>>" + str);
-                            }*/
-                            production_rules.put(found, rules_associated);
+                            }
+                            production_rules.put(found, rules_associated);*/
 
                             //add class names to constructors
                             if (found.equals("<class type identifier>")) {
@@ -436,9 +481,13 @@ public class JavaCodeGenerator {
                                 }
                                 production_rules.put("<constructor identifier>", constructor_list);
                             }
+
+
                             /*type_declarations = type_declarations.replaceFirst(found, replace).trim();
                             type_declarations = generateClass(type_declarations).trim();*/
                         }
+
+
                         if (found.equals("<method identifier>")) {
                             replace = nameGenerator.formMethodName();
 
@@ -446,65 +495,20 @@ public class JavaCodeGenerator {
 
                         type_declarations = type_declarations.replaceFirst(found, replace).trim();
                         type_declarations = generateClass(type_declarations).trim();
+
                     } else {
-                        replace = "";
-                        type_declarations = type_declarations.replaceFirst(found, replace).trim();
-                        type_declarations = generateClass(type_declarations).trim();
+                        type_declarations = type_declarations.replaceFirst(found, "");
+                        type_declarations = generateClass(type_declarations);
                     }
                 }
             }
         }
         System.out.println("Constructor List: " + production_rules.get("<constructor identifier>"));
+
         return type_declarations;
     }
 
 
-    private String generatePackage(String package_declaration) {
-
-        System.out.println("actual:" + package_declaration);
-        String regex = "[<][a-z\\s]*[>]";
-        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(package_declaration);
-
-        if (matcher.find()) {
-
-            String found = matcher.group(0).trim();
-            System.out.println("found:" + found);
-
-            if (production_rules.get(found) != null && (found.equals("<package declaration>") || found.equals("<package folder name>"))) {
-
-                ArrayList<String> rules_associated = production_rules.get(found);
-
-                if (!rules_associated.isEmpty()) {
-
-                    Random r = new Random();
-                    String replace = rules_associated.get(r.nextInt(rules_associated.size()));
-
-                    //check if allowed to replace and form
-                    if (checkConfig(found, replace)) {
-
-                        //if yes then replace
-                        if (found.equals("<package folder name>")) {
-
-                            System.out.println("replace:" + replace);
-                            rules_associated.remove(replace);
-
-                            production_rules.put(found, rules_associated);
-
-                        }
-                        package_declaration = package_declaration.replaceFirst(found, replace);
-                        package_declaration = generatePackage(package_declaration);
-                    } else {
-                        replace = "";
-                        package_declaration = package_declaration.replaceFirst(found, replace);
-                        package_declaration = generatePackage(package_declaration);
-                    }
-                }
-            }
-        }
-        return package_declaration;
-
-    }
 /*
 
     void generateClass(String type_declarations) throws ParseException {
@@ -602,18 +606,18 @@ public class JavaCodeGenerator {
         jcg.randomGrammarPicker();
         String s = "<package declaration> <import declarations>  <type declarations> ";
 
-        s = "<type declarations>";
+        //s = "<type declarations>";
 
         //s = s.replace("<package declaration>", jcg.generatePackage(s));
-        //s = jcg.generatePackage(s);
-        //s = jcg.generateImport(s);
+        s = jcg.generatePackage(s);
+        s = jcg.generateImport(s);
         s = jcg.generateClass(s);
         //s = jcg.generateClassBody(s);
 
         s = s.replaceAll("\\?", "");
-        s = s.replaceAll(";", ";\\\n");
+        s = s.replaceAll(";", ";\\\n").replaceAll("\\{","{\\\n").replaceAll("}","\\\n}");
 
-        System.out.println("\n\n\nGENERATED CODE: " + s);
+        System.out.println("\n\n\nGENERATED CODE: \n" + s);
 
         String publicClassname = getFileNameFromCodeGenerated(s);
         System.out.println("\n\n\n\n\nFile Name: " + publicClassname);
