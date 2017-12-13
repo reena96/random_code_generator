@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 
 public class JavaCodeGenerator {
 
+    static Config config = new Config();
+
     static int maxNoOfClasses = 1;
     static int maxNoOfInterfaces = 1;
     static int maxNoOfImports = 2;
@@ -342,32 +344,41 @@ public class JavaCodeGenerator {
 
     private boolean checkConfig(String found, String replace) {
 
+
         switch (found) {
             case "<type declarations>":
                 if (replace.contains("<type declaration>")) {
-                    maxNoOfTypes = maxNoOfTypes - 1;
-                    if (maxNoOfTypes < 0) {
+                    config.maxNoOfTypes -= 1;
+                    if (config.maxNoOfTypes < 0) {
                         return false;
                     } else return true;
                 }
                 break;
             case "<import declarations>":
                 if (replace.contains("<import declaration>")) {
-                    maxNoOfImports = maxNoOfImports - 1;
-                    if (maxNoOfImports < 0) {
+                    config.maxNoOfImports -= 1;
+                    if (config.maxNoOfImports < 0) {
                         return false;
                     } else return true;
                 }
                 break;
             case "<type declaration>":
                 if (replace.contains("<class declaration>")) {
-                    maxNoOfClasses = maxNoOfClasses - 1;
-                    if (maxNoOfClasses < 0) {
+                    config.noOfClasses -= 1;
+                    if (config.noOfClasses < 0) {
                         return false;
                     } else return true;
                 } else if (replace.contains("<interface declaration>")) {
-                    maxNoOfInterfaces = maxNoOfInterfaces - 1;
-                    if (maxNoOfInterfaces < 0) {
+                    config.noOfInterfaces -= 1;
+                    if (config.noOfInterfaces < 0) {
+                        return false;
+                    } else return true;
+                }
+                break;
+            case "<method declaration>":
+                if (replace.contains("<import declaration>")) {
+                    config.maxNoOfImports -= 1;
+                    if (config.maxNoOfImports < 0) {
                         return false;
                     } else return true;
                 }
@@ -394,6 +405,7 @@ public class JavaCodeGenerator {
 
                 type_declarations = optionalCFG(type_declarations);
                 ArrayList<String> rules_associated = production_rules.get(found);
+                NameGenerator nameGenerator = new NameGenerator();
                 Random r = new Random();
 
                 if (!rules_associated.isEmpty()) {
@@ -402,11 +414,13 @@ public class JavaCodeGenerator {
                     System.out.println("replace: " + replace);
 
                     if (checkConfig(found, replace)) {
-                        System.out.println("NO OF TYPES: " + maxNoOfTypes);
+                        System.out.println("NO OF TYPES: " + config.maxNoOfTypes);
 
                         if (found.equals("<interface type identifier>") || found.equals("<class type identifier>")) {
 
-                            rules_associated.remove(replace);
+                            replace = nameGenerator.formClassName();
+                            System.out.println("Class NAME GENERATED: " + replace);
+
                             /*for (String str : rules_associated) {
                                 System.out.println("------------>>>>>>" + str);
                             }*/
@@ -425,6 +439,11 @@ public class JavaCodeGenerator {
                             /*type_declarations = type_declarations.replaceFirst(found, replace).trim();
                             type_declarations = generateClass(type_declarations).trim();*/
                         }
+                        if (found.equals("<method identifier>")) {
+                            replace = nameGenerator.formMethodName();
+
+                        }
+
                         type_declarations = type_declarations.replaceFirst(found, replace).trim();
                         type_declarations = generateClass(type_declarations).trim();
                     } else {
@@ -435,6 +454,7 @@ public class JavaCodeGenerator {
                 }
             }
         }
+        System.out.println("Constructor List: " + production_rules.get("<constructor identifier>"));
         return type_declarations;
     }
 
@@ -472,12 +492,12 @@ public class JavaCodeGenerator {
                             production_rules.put(found, rules_associated);
 
                         }
-                        replace = generatePackage(replace);
                         package_declaration = package_declaration.replaceFirst(found, replace);
+                        package_declaration = generatePackage(package_declaration);
                     } else {
                         replace = "";
-                        replace = generatePackage(replace);
                         package_declaration = package_declaration.replaceFirst(found, replace);
+                        package_declaration = generatePackage(package_declaration);
                     }
                 }
             }
