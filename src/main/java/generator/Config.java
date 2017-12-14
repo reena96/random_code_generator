@@ -2,7 +2,7 @@ package generator;
 
 
 
-import java.io.*;
+import  java.io.*;
 import java.util.ArrayList;
 
 import org.json.simple.JSONArray;
@@ -15,6 +15,7 @@ public class Config {
     public static long maxNoOfImports;
     public static long maxNoOfTypes;
     public static long noOfInterfaces;
+    public static long maxNoOfMethods;
     public static long maxNoOfMethodsPerInterface;
     public static long noOfClasses;
     public static long maxAllowedMethodCalls;
@@ -53,6 +54,7 @@ public class Config {
             maxNoOfImports = (long) jsonObject.get("maxNoOfImports");
             maxNoOfTypes = (long) jsonObject.get("maxNoOfTypes");
             noOfInterfaces = (long) jsonObject.get("noOfInterfaces");
+            maxNoOfMethods = (long) jsonObject.get("maxNoOfMethods");
             maxNoOfMethodsPerInterface = (long) jsonObject.get("maxNoOfMethodsPerInterface");
             noOfClasses = (long)jsonObject.get("noOfClasses");
             maxAllowedMethodCalls = (long)jsonObject.get("maxAllowedMethodCalls");

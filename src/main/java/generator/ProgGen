@@ -2,6 +2,7 @@
   "maxNoOfImports":10,
   "maxNoOfTypes":50,
   "noOfInterfaces":10,
+  "maxNoOfMethods":10,
   "maxNoOfMethodsPerInterface":5,
   "noOfClasses":40,
   "maxAllowedMethodCalls":5,
@@ -11,7 +12,7 @@
   "noOfInheritanceChains":7,
   "maxNestedIfs":4,
   "minNoOfClassFields":2,
-  "allowArray":"yes",
+  "allowArray":"no",
   "maxInheritanceDepth":5,
   "maxNoOfParametersPerMethod":10,
   "minInheritanceDepth":2,
@@ -27,3 +28,5 @@
   "allowedTypes": ["char","byte","short", "int","long", "float", "double", "String", "Object"]
 
 }
+
+
