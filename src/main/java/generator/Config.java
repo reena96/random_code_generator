@@ -47,7 +47,7 @@ public class Config {
 
         try {
 
-            Object obj = parser.parse(new FileReader("/Users/reenamaryputhota/Documents/vishalkumar_malli_guneshekaran_saisharan_nagulapalli_reenamary/src/main/java/generator/ProgGen"));
+            Object obj = parser.parse(new FileReader("/Users/sharandec7/Desktop/vishalkumar_malli_guneshekaran_saisharan_nagulapalli_reenamary/src/main/java/generator/ProgGen"));
 
             JSONObject jsonObject = (JSONObject) obj;
 

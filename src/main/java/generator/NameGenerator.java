@@ -28,7 +28,7 @@ class NameGenerator {
             "Order", "Info", "Parameter", "Request", "Adapter", "Bridge",
             "Decorator", "Facade", "Proxy", "Worker",
             "Interpreter", "Iterator", "Observer",
-            "State", "Strategy", "Template", "Comparator", "Clone", "Task",
+            "generator.elements.State", "Strategy", "Template", "Comparator", "Clone", "Task",
             "Resolver", "Candidate", "Expression", "Predicate",
             "Thread", "Pool", "Descriptor", "Interceptor", "Definition",
             "Getter", "Setter", "Listener", "Proccesor", "Printer",

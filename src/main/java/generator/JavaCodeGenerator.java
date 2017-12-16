@@ -1,5 +1,6 @@
 package generator;
 
+import generator.elements.Clazz;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -37,7 +38,7 @@ public class JavaCodeGenerator {
             //System.out.println("key:" + key + "value:" + value);
         }
     }
-    
+
     private String generatePackage(String package_declaration) {
         System.out.println("actual:" + package_declaration);
         String regex = "[<][a-z\\s]*[>]";
@@ -83,7 +84,6 @@ public class JavaCodeGenerator {
         }
         return package_declaration;
     }
-
 
     String generateImport(String import_declaration) throws ParseException {
 
@@ -139,9 +139,9 @@ public class JavaCodeGenerator {
         return import_declaration;
     }
 
-
     String generateClass(String type_declarations) throws ParseException {
 
+        Clazz node = new Clazz();
 
         System.out.println("actual:" + type_declarations);
         String regex = "[<][a-z\\s]*[>]";
@@ -159,11 +159,16 @@ public class JavaCodeGenerator {
                 ArrayList<String> rules_associated = production_rules.get(found);
                 Random r = new Random();
 
+                if (type_declarations.equals("<method declaration>")) {
+                    // add methodInfo to clazz node
+                }
+                if (type_declarations.equals("<field declaration>")) {
+                    // add fieldInfo to clazz node
+                }
                 if (!rules_associated.isEmpty()) {
 
                     String replace = rules_associated.get(r.nextInt(rules_associated.size())).trim();
                     System.out.println("replace: " + replace);
-
 
                     if (cc.checkConfig(found, replace)) {
 
@@ -171,22 +176,21 @@ public class JavaCodeGenerator {
 
                         if (found.equals("<class access specifier>") || found.equals("<constructor modifier>")) {
 
-
-
                         }
 
-
-
                         if (found.equals("<method identifier>")) {
+                            // get method name from list of method names in clazz node
                             replace = nameGenerator.formMethodName();
-
+                        }
+                        if (found.equals("<identifier>")) {
+                            // get field name from list of method names in clazz node
+                            // replace = nameGenerator.formMethodName();
                         }
 
                         if (found.equals("<interface type identifier>") || found.equals("<class type identifier>")) {
 
                             replace = nameGenerator.formClassName();
                             System.out.println("Class NAME GENERATED: " + replace);
-
 
                             if (found.equals("<class type identifier>")) {
                                 ArrayList<String> constructor_list = production_rules.get("<constructor identifier>");
@@ -197,9 +201,7 @@ public class JavaCodeGenerator {
                                 }
                                 production_rules.put("<constructor identifier>", constructor_list);
                             }
-
-       }
-
+                        }
                         type_declarations = type_declarations.replaceFirst(found, replace).trim();
                         type_declarations = generateClass(type_declarations).trim();
 
@@ -209,45 +211,10 @@ public class JavaCodeGenerator {
                     }
                 }
             }
-
-            /*
-
-//ensures that modifiers are not repeated
-            if (production_rules.get(found) != null && found.equals("<modifier>")) {
-
-                ArrayList<String> rules_associated = production_rules.get(found);
-
-                if (!rules_associated.isEmpty()) {
-
-                    Random r = new Random();
-                    String replace = rules_associated.get(r.nextInt(rules_associated.size()));
-
-                    //check if allowed to replace and form
-
-             System.out.println("replace:" + replace);
-
-                      rules_associated.remove(replace);
-                      rules_associated.remove("");
-
-                       production_rules.put(found, rules_associated);
-
-                        type_declarations = type_declarations.replaceFirst(found, replace).trim();
-                        type_declarations = generateClass(type_declarations).trim();
-
-
-
-                }
-            }
-
-            */
-
-
         }
         System.out.println("Constructor List: " + production_rules.get("<constructor identifier>"));
-
         return type_declarations;
     }
-
 
     private String optionalCFG(String type_declarations) {
 
@@ -267,6 +234,10 @@ public class JavaCodeGenerator {
                     type_declarations = type_declarations.replaceFirst(", <formal parameter>\\?", "");
                 else
                     type_declarations = type_declarations.replaceFirst(found, "");
+            } else {
+                String replace = found.replace("\\?", "");
+                System.out.println("NOT released OPTIONAL: " + found + " - " + replace);
+                type_declarations = type_declarations.replaceFirst(found, replace);
             }
             System.out.println("replaced Optional: " + check + " : " + type_declarations);
         }
@@ -316,7 +287,7 @@ public class JavaCodeGenerator {
         //s = jcg.generateClassBody(s);
 
         s = s.replaceAll("\\?", "");
-        s = s.replaceAll(";", ";\\\n").replaceAll("\\{","{\\\n").replaceAll("}","\\\n }");
+        s = s.replaceAll(";", ";\\\n").replaceAll("\\{", "{\\\n").replaceAll("}", "\\\n }");
 
         System.out.println("\n\n\nGENERATED CODE: \n" + s);
 
@@ -325,16 +296,6 @@ public class JavaCodeGenerator {
 
         jcg.printToFile(s, publicClassname);
     }
-
-
-/* void randomGrammarPicker() {
-        Random randomNumberGenerator = new Random();
-        String grammarRule = classbnf[randomNumberGenerator.nextInt(5)];
-        //System.out.println(randomNumberGenerator.nextInt(5) + " : " + grammarRule);
-    }
-
-*/
-
 
 }
 

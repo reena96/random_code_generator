@@ -85,7 +85,7 @@ public class BNF_Grammar {
             "<result type> ::= <type> | void",
             "<method modifiers> ::= <method modifier> | <method modifiers> <method modifier>",
             //"<method modifier> ::= public | protected | private | static | abstract | final | synchronized | native",
-            "<method modifier> ::= public | protected | private | static | abstract | final | synchronized",
+            "<method modifier> ::= public | protected | private | static | abstract | final ",
             "<method declarator> ::= <method identifier> ( <formal parameter list>? )",
             "<method body> ::= <block> ",
             "<block> ::= { <block statements>? }",
@@ -133,14 +133,14 @@ public class BNF_Grammar {
             "<if then statement>::= if ( <expression> ) <statement>",
             "<if then else statement>::= if ( <expression> ) <statement no short if> else <statement>",
             "<if then else statement no short if> ::= if ( <expression> ) <statement no short if> else <statement no short if>",
-        /*
-        "<switch statement> ::= switch ( <expression> ) <switch block>",
-        "<switch block> ::= { <switch block statement groups>? <switch labels>? }",
-        "<switch block statement groups> ::= <switch block statement group> | <switch block statement groups> <switch block statement group>",
-        "<switch block statement group> ::= <switch labels> <block statements>",
-        "<switch labels> ::= <switch label> | <switch labels> <switch label>",
-        "<switch label> ::= case <constant expression> : | default :",
-        */
+            /*
+            "<switch statement> ::= switch ( <expression> ) <switch block>",
+            "<switch block> ::= { <switch block statement groups>? <switch labels>? }",
+            "<switch block statement groups> ::= <switch block statement group> | <switch block statement groups> <switch block statement group>",
+            "<switch block statement group> ::= <switch labels> <block statements>",
+            "<switch labels> ::= <switch label> | <switch labels> <switch label>",
+            "<switch label> ::= case <constant expression> : | default :",
+            */
             "<while statement> ::= while ( <expression> ) <statement>",
             "<while statement no short if> ::= while ( <expression> ) <statement no short if>",
             "<do statement> ::= do <statement> while ( <expression> ) ;",
@@ -152,14 +152,14 @@ public class BNF_Grammar {
             "<break statement> ::= break <identifier>? ;",
             "<continue statement> ::= continue <identifier>? ;",
             "<return statement> ::= return <expression>? ;",
-        /*
-        "<throws statement> ::= throw <expression> ;",
-        "<synchronized statement> ::= synchronized ( <expression> ) <block>",
-        "<try statement> ::= try <block> <catches> | try <block> <catches>? <finally>",
-        "<catches> ::= <catch clause> | <catches> <catch clause>",
-        "<catch clause> ::= catch ( <formal parameter> ) <block>",
-        "<finally > ::= finally <block>",
-        */
+            /*
+            "<throws statement> ::= throw <expression> ;",
+            "<synchronized statement> ::= synchronized ( <expression> ) <block>",
+            "<try statement> ::= try <block> <catches> | try <block> <catches>? <finally>",
+            "<catches> ::= <catch clause> | <catches> <catch clause>",
+            "<catch clause> ::= catch ( <formal parameter> ) <block>",
+            "<finally > ::= finally <block>",
+            */
             "<constant expression> ::= <expression>",
             "<expression> ::= <assignment expression>",
             "<assignment expression> ::= <conditional expression> | <assignment>",
