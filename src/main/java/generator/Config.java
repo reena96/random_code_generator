@@ -12,6 +12,7 @@ import org.json.simple.parser.ParseException;
 
 public class Config {
 
+    public static long maxNoOfStatementsPerMethod;
     public static long maxNoOfImports;
     public static long maxNoOfTypes;
     public static long noOfInterfaces;
@@ -51,6 +52,7 @@ public class Config {
 
             JSONObject jsonObject = (JSONObject) obj;
 
+            maxNoOfStatementsPerMethod = (long) jsonObject.get("maxNoOfStatementsPerMethod");
             maxNoOfImports = (long) jsonObject.get("maxNoOfImports");
             maxNoOfTypes = (long) jsonObject.get("maxNoOfTypes");
             noOfInterfaces = (long) jsonObject.get("noOfInterfaces");

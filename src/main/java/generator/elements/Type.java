@@ -11,8 +11,8 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Clazz extends State {
-    public NameGenerator nameGenerator = new NameGenerator();
+public class Type extends State {
+    NameGenerator nameGenerator = new NameGenerator();
     List<String> field_declaration_list = new ArrayList<>();
     List<String> constructor_declaration_list = new ArrayList<>();
     List<String> method_declaration_list = new ArrayList<>();
@@ -30,11 +30,12 @@ public class Clazz extends State {
         }
     }
 
-
-    public Clazz() {
+    public Type() {
         modifiers_list.add("public");
         modifiers_list.add("abstract");
     }
+
+    // METHODS REQUIRED FOR CREATING CLASS:
 
     public String createClassLine() {
 
@@ -138,6 +139,60 @@ public class Clazz extends State {
         return method_declaration_list;
     }
 
+    /*
+    public List<String> createClassMethodItems() {
+
+        List<String> method_declaration_list = new ArrayList();
+        for (int i = 1; i < 5; i++) {
+            if (rollTheDice()) {
+                MethodDeclaration md = new MethodDeclaration(nameGenerator);
+                md.parent = this;
+                method_declaration_list.add(md.createMethod());
+            }
+        }
+        return method_declaration_list;
+    }*/
+    // METHODS REQUIRED FOR CREATING INTERFACE:
+
+    public String createInterfaceLine() throws ParseException {
+
+        List<String> complete_class = new ArrayList<>();
+        String interface_declaration = "";
+        if (rollTheDice()) {
+            String modifier = modifiers_list.get(r.nextInt(modifiers_list.size()));
+            modifiers.add(modifier);
+            interface_declaration += modifier;
+        }
+        // CREATE A STRING : MODIFIER + CLASS + GENERATENAME
+        interface_declaration += " interface ";
+        String interface_name = nameGenerator.formClassName();
+        name = interface_name;
+        parent = this;
+        interface_declaration += interface_name + " { ";
+        //System.out.println(class_declaration);
+        field_declaration_list = createFieldItems();
+        for (String s : field_declaration_list) interface_declaration += s;
+        method_declaration_list = createInterfaceMethodItems();
+        for (String s : method_declaration_list) interface_declaration += s;
+        interface_declaration += "}\n";
+        System.out.println(interface_declaration);
+        return interface_declaration;
+    }
+
+
+    public List<String> createInterfaceMethodItems() throws ParseException {
+
+        List<String> method_declaration_list = new ArrayList();
+        for (int i = 1; i < 5; i++) {
+            if (rollTheDice()) {
+                MethodDeclaration md = new MethodDeclaration(nameGenerator);
+                md.parent = this;
+                method_declaration_list.add(md.createAbstractMethodDeclaration());
+            }
+        }
+        return method_declaration_list;
+    }
+
     public String getConstantList(String type) {
 
         List<?> identifier_list;
@@ -170,9 +225,9 @@ public class Clazz extends State {
     }
 
     public static void main(String[] args) throws ParseException {
-        Clazz clazz = new Clazz();
-        clazz.createClassLine();
-        //clazz.createFieldItems();
-        //clazz.printFD();
+        Type typeObject = new Type();
+        typeObject.createClassLine();
+        typeObject.createInterfaceLine();
+
     }
 }

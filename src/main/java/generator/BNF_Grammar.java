@@ -234,7 +234,9 @@ public class BNF_Grammar {
             //"<string character> ::= <input character> except \" and \\ | <escape character>",
             //"<null literal> ::= null",
             "<keyword> ::= abstract | boolean | break | byte | case | catch | char | class | const | continue | default | do | double | else | extends | final | finally | float | for | goto | if | implements | import | instanceof | int | interface | long | native | new | package | private | protected | public | return | short | static | super | switch | synchronized | this | throw | transient | try | void | volatile | while",
-            "<identifier> ::= sharan | x | y | z"
+
+
+
     };
 
 }

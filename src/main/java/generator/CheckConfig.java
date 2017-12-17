@@ -5,6 +5,15 @@ public class CheckConfig {
     public boolean checkConfig(String found, String replace) {
 
         switch (found) {
+
+            case "<statements>":
+                if (replace.contains("<statement>")) {
+                    config.maxNoOfStatementsPerMethod -= 1;
+                    if (config.maxNoOfStatementsPerMethod < 0) {
+                        return false;
+                    } else return true;
+                }
+                break;
             case "<type declarations>":
                 if (replace.contains("<type declaration>")) {
                     config.maxNoOfTypes -= 1;

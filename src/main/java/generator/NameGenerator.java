@@ -5,12 +5,12 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.HashMap;
 import java.util.Random;
 
-        import org.apache.commons.lang3.ArrayUtils;
-        import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
-        import java.util.Random;
+import java.util.Random;
 
-class NameGenerator {
+public class NameGenerator {
     Config config = new Config();
     HashMap<String ,Integer> classNames = new HashMap<>();
 
@@ -19,6 +19,8 @@ class NameGenerator {
 
     HashMap<String,Integer> methodNames = new HashMap<>();
     int noOfMethods = 10;
+    int noOfIdentifiers = 10;
+    HashMap<String,Integer> identifierNames = new HashMap<>();
 
 
     String[] nouns = {
@@ -53,39 +55,51 @@ class NameGenerator {
             "Iterable", "Distributed", "Notification", "Failure", "Type",
             "Http", "Jdbc"};
 
-    String[] verbs = { "begin", "initiate" , "generate" , "complete", "display", "print", "find", "replace", "process","compare","mutate","finalize","put","get","request"
-
-    };
+    String[] verbs = { "begin", "initiate" , "generate" , "complete", "display", "print", "find", "replace", "process","compare","mutate","finalize","put","get","request"};
 
 
     String classWord = "Class";
     String methodWord = "method";
     String generatedClassName="";
     String generatedMethodName="";
+    String generatedIdentifiedName="";
 
     public String formClassName() {
-            Random random = new Random();
+        Random random = new Random();
+        generatedClassName= generate(9, 1, classWord, nouns, inWords) + inWords[random.nextInt(5)];
+        while (classNames.containsKey(generatedClassName)){
             generatedClassName= generate(9, 1, classWord, nouns, inWords) + inWords[random.nextInt(5)];
-            while (classNames.containsKey(generatedClassName)){
-                generatedClassName= generate(9, 1, classWord, nouns, inWords) + inWords[random.nextInt(5)];
-                //System.out.println("repeated AND therefore IGNORED!");
-            }
-            classNames.put(generatedClassName,0);
+            //System.out.println("repeated AND therefore IGNORED!");
+        }
+        classNames.put(generatedClassName,0);
 
-            return generatedClassName;
+        return generatedClassName;
     }
 
     public String formMethodName() {
 
-            Random random = new Random();
+        Random random = new Random();
+        generatedMethodName= generate(8, 1, methodWord, verbs, nouns) + inWords[random.nextInt(5)];
+        while (classNames.containsKey(generatedMethodName) && noOfMethods!=0){
             generatedMethodName= generate(8, 1, methodWord, verbs, nouns) + inWords[random.nextInt(5)];
-            while (classNames.containsKey(generatedMethodName) && noOfMethods!=0){
-                generatedMethodName= generate(8, 1, methodWord, verbs, nouns) + inWords[random.nextInt(5)];
-                //System.out.println("repeated AND therefore IGNORED!");
-            }
-            methodNames.put(generatedMethodName,0);
-            return generatedMethodName;
+            //System.out.println("repeated AND therefore IGNORED!");
+        }
+        methodNames.put(generatedMethodName,0);
+        return generatedMethodName;
     }
+
+    public String formIdentifierName() {
+
+        Random random = new Random();
+        generatedIdentifiedName= generate(8, 1, methodWord, verbs, nouns).toLowerCase() + "_" +inWords[random.nextInt(5)].toLowerCase();
+        while (identifierNames.containsKey(generatedIdentifiedName) && noOfIdentifiers!=0){
+            generatedIdentifiedName= generate(8, 1, methodWord, verbs, nouns) +inWords[random.nextInt(5)];
+            //System.out.println("repeated AND therefore IGNORED!");
+        }
+        identifierNames.put(generatedIdentifiedName,0);
+        return generatedIdentifiedName;
+    }
+
 
     public String generate(int min, int max, String word,String[] nouns, String[] inWords) {
         String[] allWords = ArrayUtils.addAll(nouns, inWords);
@@ -95,7 +109,7 @@ class NameGenerator {
             do {
                 w = allWords[(int) rand(0, nouns.length- 1)];
             } while (word.indexOf(w) != -1);
-            word += w;
+            word+=w;
         }
         return nouns[(int) rand(0, nouns.length-1)];
         //return word;
@@ -109,7 +123,7 @@ class NameGenerator {
         NameGenerator nameGenerator = new NameGenerator();
         System.out.println(nameGenerator.formClassName());
         System.out.println(nameGenerator.formMethodName());
-
+        //System.out.print("Identifier "+nameGenerator.formIdentifierName());
 
     }
 

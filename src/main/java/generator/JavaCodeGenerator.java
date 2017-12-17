@@ -1,28 +1,164 @@
 package generator;
 
-import generator.elements.Clazz;
+import generator.elements.FieldDeclaration;
+import generator.elements.Type;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class JavaCodeGenerator {
 
-    static Config config = new Config();
-    NameGenerator nameGenerator = new NameGenerator();
-    BNF_Grammar bnf_grammar = new BNF_Grammar();
+
+    public List<FieldDeclaration> updated_declaration_list = new ArrayList<>();
+    BNF_Grammar_Statements bnf_grammar = new BNF_Grammar_Statements();
+    String type = "";
+    Config config = new Config();
+    public NameGenerator nameGenerator = new NameGenerator();
+    static final int MAX_HOPS = 1000;
     CheckConfig cc = new CheckConfig();
     String[] classbnf = bnf_grammar.classbnf;
+    static int hopCount = 0;
+    public int maxNoOfStatementsPerMethod = 10;
 
     HashMap<String, ArrayList<String>> production_rules = new HashMap<>();
+    static SecureRandom r;
 
-    void createHM() {
+    static {
+        try {
+            r = SecureRandom.getInstanceStrong();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public JavaCodeGenerator() {
+        createHM();
+    }
+
+    public boolean checkConfig(String found, String replace) {
+
+        switch (found) {
+
+            case "<statements>":
+                if (replace.contains("<statement>")) {
+                    maxNoOfStatementsPerMethod -= 1;
+                    if (maxNoOfStatementsPerMethod < 0) {
+                        return false;
+                    } else return true;
+                }
+                break;
+            case "<type declarations>":
+                if (replace.contains("<type declaration>")) {
+                    config.maxNoOfTypes -= 1;
+                    if (config.maxNoOfTypes < 0) {
+                        return false;
+                    } else return true;
+                }
+                break;
+            case "<import declarations>":
+                if (replace.contains("<import declaration>")) {
+                    config.maxNoOfImports -= 1;
+                    if (config.maxNoOfImports < 0) {
+                        return false;
+                    } else return true;
+                }
+                break;
+            case "<type declaration>":
+                if (replace.contains("<class declaration>")) {
+                    config.noOfClasses -= 1;
+                    if (config.noOfClasses < 0) {
+                        return false;
+                    } else return true;
+                } else if (replace.contains("<interface declaration>")) {
+                    config.noOfInterfaces -= 1;
+                    if (config.noOfInterfaces < 0) {
+                        return false;
+                    } else return true;
+                }
+                break;
+            case "<method declaration>":
+                if (replace.contains("<import declaration>")) {
+                    config.maxNoOfMethods -= 1;
+                    if (config.maxNoOfMethods < 0) {
+                        return false;
+                    } else return true;
+                }
+                break;
+            case "<method invocation>":
+                if (replace.contains("<method invocation>")) {
+                    config.maxAllowedMethodCalls -= 1;
+                    if (config.maxAllowedMethodCalls < 0) {
+                        return false;
+                    } else return true;
+                }
+                break;
+            default:
+                return true;
+        }
+        return true;
+    }
+
+    public static String getFileNameFromCodeGenerated(String generatedCode) {
+
+        ArrayList<String> t = new ArrayList<String>();
+        for (String r : generatedCode.split(" ")) {
+            if (!r.trim().isEmpty()) {
+                t.add(r.trim());
+                //System.out.println("TOKEN: " + r.trim());
+            }
+        }
+
+        if (t.indexOf("public") != -1) {
+            int Position = t.indexOf("public");
+            if (t.get(Position + 1) == "class" || t.get(Position + 1) == "interface") {
+                return t.get(Position + 2);
+            }
+        }
+
+        return "NotFound";
+    }
+
+    public static void main(String args[]) throws IOException {
+
+        List<FieldDeclaration> fieldDeclarationsList = new ArrayList<>();
+        FieldDeclaration fieldDeclaration = new FieldDeclaration();
+        fieldDeclaration.type = "int";
+        fieldDeclaration.name = "variable_1";
+        fieldDeclaration.assignment = "1";
+        fieldDeclarationsList.add(fieldDeclaration);
+        JavaCodeGenerator jcg = new JavaCodeGenerator();
+        jcg.createHM();
+        String s = "<package declaration> <import declarations>  <type declarations> ";
+        s = "<statements>";
+        //s = s.replace("<package declaration>", jcg.generatePackage(s));
+        //s = jcg.generatePackage(s);
+        //s = jcg.generateImport(s);
+        s = jcg.generateClass(s, fieldDeclarationsList, new NameGenerator());
+        //s = jcg.generateClassBody(s);
+
+        s = s.replaceAll("\\?", "");
+        s = s.replaceAll(";", ";\\\n").replaceAll("\\{", "{\\\n").replaceAll("}", "\\\n }");
+
+        System.out.println("\n\n\nGENERATED CODE: \n" + s);
+
+        String publicClassname = getFileNameFromCodeGenerated(s);
+        System.out.println("\n\n\n\n\nFile Name: " + publicClassname);
+
+        //jcg.printToFile(s, publicClassname);
+    }
+
+    public void createHM() {
         for (String rule : classbnf) {
             String rules = rule.split("::=")[1].trim();
             ArrayList<String> t = new ArrayList<>();
@@ -39,8 +175,10 @@ public class JavaCodeGenerator {
         }
     }
 
-    private String generatePackage(String package_declaration) {
+    public String generatePackage(String package_declaration) {
+
         System.out.println("actual:" + package_declaration);
+        package_declaration = "package newlyGeneratedCode;";
         String regex = "[<][a-z\\s]*[>]";
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(package_declaration);
@@ -85,9 +223,10 @@ public class JavaCodeGenerator {
         return package_declaration;
     }
 
-    String generateImport(String import_declaration) throws ParseException {
+    public String generateImport(String import_declaration) {
 
         System.out.println("actual:" + import_declaration);
+        import_declaration = "import java.*";
         String regex = "[<][a-z\\s]*[>]";
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(import_declaration);
@@ -135,13 +274,20 @@ public class JavaCodeGenerator {
                     }
                 }
             }
+
+
         }
         return import_declaration;
     }
 
-    String generateClass(String type_declarations) throws ParseException {
+    public String generateClass(String type_declarations, List<FieldDeclaration> field_declaration_list, NameGenerator nameGenerator) {
 
-        Clazz node = new Clazz();
+        updated_declaration_list = field_declaration_list;
+        System.out.println(hopCount++);
+        if (hopCount > MAX_HOPS) {
+            hopCount /= 2;
+        }
+        //Clazz node = new Clazz();
 
         System.out.println("actual:" + type_declarations);
         String regex = "[<][a-z\\s]*[>]";
@@ -153,38 +299,23 @@ public class JavaCodeGenerator {
             String found = matcher.group(0).trim();
             System.out.println("found:" + found);
 
-            if (production_rules.get(found) != null) {
+            if (production_rules.get(found) != null && hopCount < MAX_HOPS) {
 
                 type_declarations = optionalCFG(type_declarations);
                 ArrayList<String> rules_associated = production_rules.get(found);
-                Random r = new Random();
 
-                if (type_declarations.equals("<method declaration>")) {
-                    // add methodInfo to clazz node
-                }
-                if (type_declarations.equals("<field declaration>")) {
-                    // add fieldInfo to clazz node
-                }
                 if (!rules_associated.isEmpty()) {
 
                     String replace = rules_associated.get(r.nextInt(rules_associated.size())).trim();
                     System.out.println("replace: " + replace);
 
-                    if (cc.checkConfig(found, replace)) {
+                    if (checkConfig(found, replace)) {
 
                         System.out.println(config.maxNoOfTypes);
-
-                        if (found.equals("<class access specifier>") || found.equals("<constructor modifier>")) {
-
-                        }
 
                         if (found.equals("<method identifier>")) {
                             // get method name from list of method names in clazz node
                             replace = nameGenerator.formMethodName();
-                        }
-                        if (found.equals("<identifier>")) {
-                            // get field name from list of method names in clazz node
-                            // replace = nameGenerator.formMethodName();
                         }
 
                         if (found.equals("<interface type identifier>") || found.equals("<class type identifier>")) {
@@ -203,20 +334,95 @@ public class JavaCodeGenerator {
                             }
                         }
                         type_declarations = type_declarations.replaceFirst(found, replace).trim();
-                        type_declarations = generateClass(type_declarations).trim();
+                        type_declarations = generateClass(type_declarations, field_declaration_list, nameGenerator).trim();
 
                     } else {
                         type_declarations = type_declarations.replaceFirst(found, "");
-                        type_declarations = generateClass(type_declarations);
+                        type_declarations = generateClass(type_declarations, field_declaration_list, nameGenerator);
                     }
                 }
+
+
+            } else if (found.equals("<expression int>") || found.equals("<expression String>") || found.equals("<expression boolean>") ||
+                    found.equals("<expressionLH int>") || found.equals("<expressionLH String>") || found.equals("<expressionLH boolean>")) {
+                String[] expression = found.split(" ");
+                type = expression[1].replaceFirst(">", "");
+                type_declarations.replaceFirst(found, expression[0] + ">");
+                String replace = expression[0] + ">";
+                type_declarations = type_declarations.replaceFirst(found, replace);
+                type_declarations = generateClass(type_declarations, field_declaration_list, nameGenerator);
+            }
+            // <identifier> is getting replaced
+
+            else if (found.equals("<identifier>")) {
+
+                List<FieldDeclaration> filtered_identifiers = new ArrayList<>();
+
+                if (!type.isEmpty()) {
+                    for (FieldDeclaration fd : field_declaration_list) {
+                        System.out.println("FD: " + fd.type + " : " + type + " : " + fd.type.equals(type));
+                        if (fd.type.equals(type)) {
+                            filtered_identifiers.add(fd);
+                            //type = fd.type;
+                        }
+                    }
+                    if (filtered_identifiers.isEmpty()) {
+
+                        System.out.println("FD: found nothing so creating: " + type);
+                        FieldDeclaration fd = new FieldDeclaration();
+                        fd.type = type;
+                        fd.name = nameGenerator.formIdentifierName();
+                        switch (type) {
+                            case "int":
+                                fd.assignment = "7865";
+                                break;
+                            case "String":
+                                fd.assignment = " \" added \"";
+                                break;
+                            case "boolean":
+                                fd.assignment = "true";
+                                break;
+                        }
+                        for (FieldDeclaration f : field_declaration_list)
+                            System.out.println("/////////////" + f.type + " " + f.name + " " + f.assignment);
+                        filtered_identifiers.add(fd);
+                        for (FieldDeclaration f : field_declaration_list)
+                            System.out.println("/////////////" + f.type + " " + f.name + " " + f.assignment);
+                        field_declaration_list.add(fd);
+                    }
+                } else {
+                    filtered_identifiers = field_declaration_list;
+                }
+                int f = r.nextInt(filtered_identifiers.size());
+                String identifier_name = filtered_identifiers.get(f).name;
+
+                System.out.println();
+                type_declarations = type_declarations.replaceFirst(found, identifier_name);
+                type_declarations = generateClass(type_declarations, field_declaration_list, nameGenerator);
+            } else if (found.equals("<value>")) {
+
+                String replace = "";
+                System.out.println(" TYPE EVERYTIME: " + type);
+                if (!type.isEmpty()) {
+                    if (type.equals("String")) {
+                        replace = "\"" + new Type().getConstantList(type) + "\"";
+                    } else {
+                        replace = new Type().getConstantList(type);
+                    }
+                } else {
+                    replace = "null";
+                }
+                type_declarations = type_declarations.replaceFirst(found, replace);
+                type_declarations = generateClass(type_declarations, field_declaration_list, nameGenerator);
             }
         }
-        System.out.println("Constructor List: " + production_rules.get("<constructor identifier>"));
+        //System.out.println("Constructor List: " + production_rules.get("<constructor identifier>"));
         return type_declarations;
     }
 
-    private String optionalCFG(String type_declarations) {
+    public String optionalCFG(String type_declarations) {
+
+        System.out.println(hopCount++);
 
         System.out.println("Optional: " + type_declarations);
         String regex = "[<][a-z\\s]*[>][\\?]";
@@ -227,9 +433,8 @@ public class JavaCodeGenerator {
 
             String found = matcher.group(0).trim().replace("?", "\\?");
             System.out.println("found optional: " + found);
-            Random r = new Random();
-            int check = r.nextInt(2);
-            if (check == 0) {
+            int check = r.nextInt(100);
+            if (check > 70 && hopCount < MAX_HOPS) {
                 if (found.equals("<formal parameter>?"))
                     type_declarations = type_declarations.replaceFirst(", <formal parameter>\\?", "");
                 else
@@ -244,57 +449,13 @@ public class JavaCodeGenerator {
         return type_declarations;
     }
 
-
-    private static String getFileNameFromCodeGenerated(String generatedCode) {
-
-        ArrayList<String> t = new ArrayList<String>();
-        for (String r : generatedCode.split(" ")) {
-            if (!r.trim().isEmpty()) {
-                t.add(r.trim());
-                //System.out.println("TOKEN: " + r.trim());
-            }
-        }
-        if (t.indexOf("class") != -1) {
-            int Position = t.indexOf("class");
-            return t.get(Position + 1);
-        } else if (t.indexOf("interface") != -1) {
-            int Position = t.indexOf("interface");
-            return t.get(Position + 1);
-        }
-        return "NotFound";
-    }
-
-    void printToFile(String generatedCode, String filename) throws IOException {
+    public void printToFile(String generatedCode, String filename) throws IOException {
 
         File f = new File("src/main/java/newlyGeneratedCode", filename + ".java");
 
         if (!f.exists())//check if the file already exists
             f.createNewFile();
         FileUtils.writeStringToFile(f, generatedCode);
-    }
-
-    public static void main(String args[]) throws ParseException, IOException {
-
-
-        JavaCodeGenerator jcg = new JavaCodeGenerator();
-        jcg.createHM();
-        String s = "<package declaration> <import declarations>  <type declarations> ";
-        //s = "<type declarations>";
-        //s = s.replace("<package declaration>", jcg.generatePackage(s));
-        s = jcg.generatePackage(s);
-        s = jcg.generateImport(s);
-        s = jcg.generateClass(s);
-        //s = jcg.generateClassBody(s);
-
-        s = s.replaceAll("\\?", "");
-        s = s.replaceAll(";", ";\\\n").replaceAll("\\{", "{\\\n").replaceAll("}", "\\\n }");
-
-        System.out.println("\n\n\nGENERATED CODE: \n" + s);
-
-        String publicClassname = getFileNameFromCodeGenerated(s);
-        System.out.println("\n\n\n\n\nFile Name: " + publicClassname);
-
-        jcg.printToFile(s, publicClassname);
     }
 
 }
