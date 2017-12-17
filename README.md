@@ -33,15 +33,13 @@ These states/rules are stored in the value of the hash map.
 
 ## 2) Initializing the Code with a starting set of Non-terminals: ##
 We start off with a string that contains the non terminals that we would like to start off our code with:
-String s = "<package declaration> <import declarations>  <type declarations> 
+String s = "<package declaration> <import declarations>  <type declarations> "
 
 ## 3) Building blocks of Java Code: ##
 ### (i) Generating Package Statements: ###
 We use regex to look for non terminals in the string which are all enclosed by angular braces.
  < package declaration >
-Each time, we check the Config file if we have exceeded the number of package declaration statements that we are allowed to declare. 
-So, we replace package declaration by its corresponding production rules.
-We update the replaced String and we recursively call generatePackage() with the parameter containing the updated string until we generate meaningful package statements.
+e update the replaced String and we recursively call generatePackage() with the parameter containing the updated string until we generate a meaningful package statement.
 
 ### (ii) Generating Import Statements: ###
  We again use regex to look for non terminals in the string which are enclosed by angular braces.
@@ -54,7 +52,24 @@ We keep checking for the number of allowed imports using the checkConfig()
 Also, we ensure that an import declaration statement that has already been declared is not declared twice. We do so by deleting from the set of rules-
 the set of imports that we have already generated in the code.
 
-
+### (iii) Generating Classes ###
+We have classes defined for each type of node- Class, Interface, Field Declaration and Method Declaration.
+We also have a class called State which defines the current state of any node.
+Like name of the class, parent class node, field declarations in the block, methods declarations, modifier set and lists of primitive constants
+that include int,boolean and String.
+The whole sequence of generating classes is trigerred by the Main class.
+/src/main/java/generator/Main.java
+The Main.java, abides by the configuration values of the Config file with respect to the values of the number of classes, number of interfaces etc.
+It makes a decision of "flipTheCoin()" to decide at each iteration of whether the class/interface should be created or not.
+Then it invokes the methods which autogenerate classes and interfaces.
+The whole flow of generating the Java code for the class deals with using the above mentioned classes which describe the nodes. 
+The Class Node creates the Class Declaration, which includes the creation of Global variables. It then passes the control over to atiothe Method
+Declaration node, which takes care of the creating the method declarations along with its local varibales.
+The body of the method declaration is handled by the Java Code Generator, which is a BNF Grammar parser, involving a block of statements.
+The critical part of the scopes of variables is maintained by the hierarchy of classes, State, Clazz declarations, MethodDeclarations and FieldDeclarations, 
+which are connected to each other by the parent attribute of the object of type State.
+The State attribute at each level of the hierarchy holds the global and local variables in the block of scope.
+Using this, we generate and maintain the scope of variables.
 
 
 
