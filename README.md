@@ -2,17 +2,17 @@ We have created a generator that creates syntactically correct but semantically 
  
 We have attempted to build a grammar based off on which we have programmed our Random Code Generator.
 
-
+### Config ###
  
-### Procedure ###
+#### ProgGen ####
 
 /src/main/java/generator/ProgGen
 ProgGen is JSON file that is configurable to the needs of what kind of a Random Code is required and helps us place the restriction on how much code is generated.
 
-### Config File ###
+#### Config File ####
 Config file is a Java class that obtains all values from the ProgGen JSON file.
 
-### CheckConfig File ###
+#### CheckConfig File ####
 CheckConfig file checks the number of import declarations, type declarations- classes and interfaces, method declarations etc that have been generated. Since the configuration values are obtained from the ProgGen file in Config file have been made static, they have only one copy and then they are decremented each time and code is generated until these values reach zero or terminals are reached in the code string that we are generating, whichever happens earlier.
 
 ### Building the Hash Map of production_rules: ###
@@ -23,7 +23,7 @@ These states/rules are stored in the value of the hash map.
 
 ### Initializing the Code with a starting set of Non-terminals: ###
 We start off with a string that contains the non terminals that we would like to start off our code with:
-String s = "<package declaration> <import declarations>  <type declarations> â€œ
+String s = "<package declaration> <import declarations>  <type declarations> “
 
 ### Building blocks of Java Code: ###
 	#### Generating Package Statements: ####
