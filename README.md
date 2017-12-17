@@ -15,7 +15,7 @@ Config file is a Java class that obtains all values from the ProgGen JSON file.
 #### CheckConfig File ####
 CheckConfig file checks the number of import declarations, type declarations- classes and interfaces, method declarations etc that have been generated. Since the configuration values are obtained from the ProgGen file in Config file have been made static, they have only one copy and then they are decremented each time and code is generated until these values reach zero or terminals are reached in the code string that we are generating, whichever happens earlier.
 
-### Building the Hash Map of production_rules: ###
+# Building the Hash Map of production_rules: #
 We begin by storing the production rules into a hash map.
 Each key of the hash map contains the left hand side of the grammar rules, which is a non-terminal of the production rule.
 The right hand side of the production rule contains the set of corresponding possible states that the non-terminal can have.
