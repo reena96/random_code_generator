@@ -8,7 +8,7 @@ We have created a generator that creates syntactically correct but semantically 
  
 We have attempted to build a grammar based off on which we have programmed our Random Code Generator.
 
-## How to Run ## 
+## How to Run 
 #### Run /src/main/java/generator/Main.java ####
 #### The newly created classes and interfaces will be created in the package of /src/main/java/newlyGeneratedCode ####
 
