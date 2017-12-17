@@ -15,6 +15,10 @@ Config file is a Java class that obtains all values from the ProgGen JSON file.
 #### CheckConfig ####
 CheckConfig file checks the number of import declarations, type declarations- classes and interfaces, method declarations etc that have been generated. Since the configuration values are obtained from the ProgGen file in Config file have been made static, they have only one copy and then they are decremented each time and code is generated until these values reach zero or terminals are reached in the code string that we are generating, whichever happens earlier.
 
+## BNF_Grammar ##
+BNF_Grammar is a Java Class that contains a set of production rules that we store in order to use them everytime a non-terminal is encountered. 
+BNF_Grammar contains rules defined for package declarations, import declarations, type declarations, method declarations, statements etc.
+
 ## 1) Building the Hash Map of production_rules: ##
 We begin by storing the production rules into a hash map.
 Each key of the hash map contains the left hand side of the grammar rules, which is a non-terminal of the production rule.
@@ -38,6 +42,13 @@ We update the replaced String and we recursively call generatePackage() with the
  < import declaration >
 Each time, we check the Config file if we have exceeded the number of import declaration statements that we are allowed to declare. And 
 So, we once again replace <import declaration> statements by its corresponding declaration rules. 
+During the recursive calls, when we find an <import identifier>, we replace it by some or all of the imports as specified by the <import identifier> rule.
+We keep checking for the number of allowed imports using the checkConfig()
+
+Also, we ensure that an import declaration statement that has already been declared is not declared twice. We do so by deleting from the set of rules-
+the set of imports that we have already generated in the code.
+
+
 
 
 
