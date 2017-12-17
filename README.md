@@ -2,7 +2,7 @@ We have created a generator that creates syntactically correct but semantically 
  
 We have attempted to build a grammar based off on which we have programmed our Random Code Generator.
 
-### Config ###
+## Config ##
  
 #### ProgGen ####
 
@@ -23,7 +23,7 @@ These states/rules are stored in the value of the hash map.
 
 ### Initializing the Code with a starting set of Non-terminals: ###
 We start off with a string that contains the non terminals that we would like to start off our code with:
-String s = "<package declaration> <import declarations>  <type declarations> “
+String s = "<package declaration> <import declarations>  <type declarations> ï¿½
 
 ### Building blocks of Java Code: ###
 	#### Generating Package Statements: ####
