@@ -1,8 +1,4 @@
 ## Team Members: ##
-#### Vishal Kumar Malli Gunasekaran ####
-#### Sai Sharan Nagulapalli ####
-#### Reena Mary Puthota ####
-#### Tathagata Ganguly ####
 
 We have created a generator that creates syntactically correct but semantically meaningless Java application.
  
