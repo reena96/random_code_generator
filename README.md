@@ -1,9 +1,10 @@
-We have created a generator that creates syntactically correct but semantically meaningless Java application.
-We have to build a grammar based off on which we have programmed our Random Code Generator.
+We have created a java code generator algorithm that creates syntactically correct but semantically meaningless Java application.
+We have built a grammar for the production rules of javac based off on which we have programmed our Random Code Generator.
 
 Existing Random Code Base generators: https://blog.takipi.com/java-bullshifier-generate-massive-random-code-bases/
 
-## How to Run 
+## How to Run ode.
+
 #### Run /src/main/java/generator/Main.java ####
 #### The newly created classes and interfaces will be created in the package of /src/main/java/newlyGeneratedCode ####
 
