@@ -1,6 +1,5 @@
 We have created a generator that creates syntactically correct but semantically meaningless Java application.
-We have attempted to build a grammar based off on which we have programmed our Random Code Generator.
-Generating random code 
+We have to build a grammar based off on which we have programmed our Random Code Generator.
 
 Existing Random Code Base generators: https://blog.takipi.com/java-bullshifier-generate-massive-random-code-bases/
 
