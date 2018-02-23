@@ -3,7 +3,7 @@ We have built a grammar for the production rules of javac based off on which we 
 
 Existing Random Code Base generators: https://blog.takipi.com/java-bullshifier-generate-massive-random-code-bases/
 
-## How to Run ode.
+## How to Run code.
 
 #### Run /src/main/java/generator/Main.java ####
 #### The newly created classes and interfaces will be created in the package of /src/main/java/newlyGeneratedCode ####
