@@ -1,12 +1,7 @@
-## Team Members: ##
-
-#### Sai Sharan Nagulapalli ####
-#### Reena Mary Puthota ####
-#### Tathagata Ganguly ####
-#### Vishal Kumar Malli Gunasekaran ####
-
 We have created a generator that creates syntactically correct but semantically meaningless Java application.
 We have attempted to build a grammar based off on which we have programmed our Random Code Generator.
+
+Existing Random Code Base generators: https://blog.takipi.com/java-bullshifier-generate-massive-random-code-bases/
 
 ## How to Run 
 #### Run /src/main/java/generator/Main.java ####
@@ -37,13 +32,13 @@ These states/rules are stored in the value of the hash map.
 
 ## 2) Initializing the Code with a starting set of Non-terminals: ##
 We start off with a string that contains the non terminals that we would like to start off our code with:
-String s = "<package declaration> <import declarations>  <type declarations> "
+String s = "<package declaration> <import declarations> <type declarations> "
 
 ## 3) Building blocks of Java Code: ##
 ### (i) Generating Package Statements: ###
-We use regex to look for non terminals in the string which are all enclosed by angular braces.
- < package declaration >
-e update the replaced String and we recursively call generatePackage() with the parameter containing the updated string until we generate a meaningful package statement.
+We use regex to look for non terminals in the string which are all enclosed by angular braces
+Ex: < package declaration 
+The non terminal in the production is replaced by its associated right hand side value associated with it. We recursively call generatePackage() with the parameter containing the updated string until we generate a meaningful package statement.
 
 ### (ii) Generating Import Statements: ###
  We again use regex to look for non terminals in the string which are enclosed by angular braces.
@@ -59,8 +54,7 @@ the set of imports that we have already generated in the code.
 ### (iii) Generating Classes ###
 We have classes defined for each type of node- Class, Interface, Field Declaration and Method Declaration.
 We also have a class called State which defines the current state of any node.
-Like name of the class, parent class node, field declarations in the block, methods declarations, modifier set and lists of primitive constants
-that include int,boolean and String.
+Like name of the class, parent class node, field declarations in the block, methods declarations, modifier set and lists of primitive constants that include int,boolean and String.
 The whole sequence of generating classes is trigerred by the Main class.
 /src/main/java/generator/Main.java
 The Main.java, abides by the configuration values of the Config file with respect to the values of the number of classes, number of interfaces etc.
